@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITRACKER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: #333;
+            height: 15vh;
+            flex-shrink: 0;
+            transition: height 0.3s ease;
+            padding: 15px;
+        }
+
+        nav {
+            height: 100%;
+            background-color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-left {
+            gap: 20px;
+        }
+
+        .nav-right {
+            gap: 10px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            font-size: larger;
+        }
+
+        /* Mobile Menu Styles */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .hamburger .bar {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 5px 0;
+            transition: 0.4s;
+        }
+
+        .overlay {
+            height: 100vh;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #333;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .overlay a {
+            color: white;
+            text-decoration: none;
+            font-size: 2em;
+            padding: 15px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 3em;
+            color: white;
+        }
+
+        @media(max-width: 768px){
+            .navbar{
+                height:fit-content;
+            }
+            nav {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+            .nav-left, .nav-right {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-left, .nav-right {
+                display: none;
+            }
+
+            .hamburger {
+                display: block;
+                position: absolute;
+                right: 20px;
+                top: 20px;
+            }
+
+            .navbar {
+                height: 8vh;
+                padding: 5px 0;
+            }
+
+            .overlay.active {
+                display: flex;
+            }
+
+            .hamburger.active .bar:nth-child(1) {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+
+            .hamburger.active .bar:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active .bar:nth-child(3) {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
+        }
+
+        /* Content Styles */
+        .content {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <nav>
+            <div class="nav-left">
+                <a href="Home.html" target="contentarea">Home</a>
+                <a href="Training.html" target="contentarea">Training Plan</a>
+                <a href="Contact.html" target="contentarea">Contact</a>
+            </div>
+            <div class="nav-right">
+                <a href="Login_page.html" target="contentarea" id="loginButton">Login</a>
+                <a href="dashboard.html" target="contentarea" id="dashboardButton" class="hidden">Dashboard</a>
+                <a href="#" id="logoutButton" class="hidden" onclick="logout()">Logout</a>
+            </div>
+            <div class="hamburger" onclick="toggleMenu()">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <a href="javascript:void(0)" class="close-btn" onclick="toggleMenu()">&times;</a>
+        <a href="Home.html" target="contentarea" onclick="toggleMenu()">Home</a>
+        <a href="Training.html" target="contentarea" onclick="toggleMenu()">Training Plan</a>
+        <a href="Contact.html" target="contentarea" onclick="toggleMenu()">Contact</a>
+        <a href="Login_page.html" target="contentarea" id="mobileLoginButton" onclick="toggleMenu()">Login</a>
+        <a href="dashboard.html" target="contentarea" id="mobileDashboardButton" class="hidden" onclick="toggleMenu()">Dashboard</a>
+        <a href="#" id="mobileLogoutButton" class="hidden" onclick="logout()">Logout</a>
+    </div>
+
+    <div class="content">
+        <iframe src="Home.html" name="contentarea"></iframe>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const overlay = document.getElementById('overlay');
+            const hamburger = document.querySelector('.hamburger');
+            overlay.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        function logout() {
+            localStorage.removeItem("loggedIn");
+            updateNavigation();
+            document.querySelector('iframe[name="contentarea"]').src = "Login_page.html";
+        }
+
+        function updateNavigation() {
+            const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+            
+            // Desktop navigation
+            document.getElementById('loginButton').classList.toggle('hidden', isLoggedIn);
+            document.getElementById('dashboardButton').classList.toggle('hidden', !isLoggedIn);
+            document.getElementById('logoutButton').classList.toggle('hidden', !isLoggedIn);
+            
+            // Mobile navigation
+            document.getElementById('mobileLoginButton').classList.toggle('hidden', isLoggedIn);
+            document.getElementById('mobileDashboardButton').classList.toggle('hidden', !isLoggedIn);
+            document.getElementById('mobileLogoutButton').classList.toggle('hidden', !isLoggedIn);
+        }
+
+        // Check login status when the page loads
+        document.addEventListener("DOMContentLoaded", function() {
+            updateNavigation();
+        });
+
+        // Listen for storage events to handle updates across tabs
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'loggedIn') {
+                updateNavigation();
+            }
+        });
+    </script>
+</body>
+</html>

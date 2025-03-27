@@ -1,1 +1,1 @@
-# MST-LAB
+# mstlab
